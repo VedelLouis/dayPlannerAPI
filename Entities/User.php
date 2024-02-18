@@ -1,7 +1,7 @@
 <?php
 
 namespace Entities;
-class User {
+class User implements \JsonSerializable {
     private $idUser;
     private $login;
     private $password;
@@ -53,6 +53,16 @@ class User {
 
     public function setLastName($lastName) {
         $this->lastName = $lastName;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'success' => 1,
+            'idUser' => $this->idUser,
+            'login' => $this->login,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName
+        ];
     }
 }
 

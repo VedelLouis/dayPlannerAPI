@@ -6,20 +6,19 @@ use Repositories\UserRepository;
 
 class AccountController
 {
+
     public function __construct($action)
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+
         switch ($action) {
             case "index":
-                $this->afficherCreateView();
+                $this->connectedUser();
+                break;
+            case "user":
+                $this->getUser();
                 break;
             case "create":
                 $this->creerUser();
-                break;
-            case "account":
-                $this->voirMonCompte();
                 break;
             case "edit":
                 $this->modifierMonCompte();
@@ -30,9 +29,27 @@ class AccountController
         }
     }
 
-    private function afficherCreateView()
+    private function connectedUser()
     {
-        include "Views/CreerAccountView.php";
+        $connectedUser = UserRepository::getUserById($_SESSION['idUser']);
+        if ($connectedUser) {
+            echo json_encode($connectedUser, JSON_PRETTY_PRINT);
+        } else {
+            echo json_encode(['success' => 0]);
+        }
+
+    }
+
+    private function getUser()
+    {
+        $idUser = filter_input(INPUT_GET, 'iduser', FILTER_SANITIZE_NUMBER_INT);
+        $connectedUser = UserRepository::getUserById($idUser);
+        if ($connectedUser) {
+            echo json_encode($connectedUser, JSON_PRETTY_PRINT);
+        } else {
+            echo json_encode(['success' => 0]);
+        }
+
     }
 
     private function creerUser()
@@ -46,13 +63,6 @@ class AccountController
 
         UserRepository::createUser($login, $password, $firstname, $lastname);
 
-        header("Location: index.php?controller=connexion&action=index");
-
-    }
-
-    private function voirMonCompte()
-    {
-        include "Views/MyAccountView.php";
     }
 
     private function modifierMonCompte()
