@@ -61,7 +61,8 @@ class User implements \JsonSerializable {
             'idUser' => $this->idUser,
             'login' => $this->login,
             'firstName' => $this->firstName,
-            'lastName' => $this->lastName
+            'lastName' => $this->lastName,
+            'session' => session_id()
         ];
     }
 }

@@ -69,4 +69,34 @@ class UserRepository
         $stmt->execute();
     }
 
+    public static function updateUser($idUser, $login, $password, $firstname, $lastname) {
+        // Si un nouveau mot de passe a été fourni
+        if (!empty($password)) {
+            // Hachage avec bcrypt
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        } else {
+            // Si aucun nouveau mot de passe n'est fourni, utilise le mot de passe existant
+            $userData = self::getUserById($idUser);
+            $hashedPassword = $userData->getPassword();
+        }
+
+        $sql = "UPDATE Users SET login = :login, password = :password, firstname = :firstname, lastname = :lastname WHERE idUser = :idUser";
+        $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
+
+        $stmt->bindParam(':idUser', $idUser, PDO::PARAM_INT);
+        $stmt->bindParam(':login', $login, PDO::PARAM_STR);
+        $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+        $stmt->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+        $stmt->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+
+    public static function deleteUser($idUser) {
+        $sql = "DELETE FROM Users WHERE idUser = :idUser;";
+        $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
+        $stmt->bindParam(':idUser', $idUser, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
 }

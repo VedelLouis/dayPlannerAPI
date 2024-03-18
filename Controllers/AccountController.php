@@ -9,7 +9,7 @@ class AccountController
 
     public function __construct($action)
     {
-
+        session_start();
         switch ($action) {
             case "index":
                 $this->connectedUser();
@@ -25,6 +25,9 @@ class AccountController
                 break;
             case "delete":
                 $this->supprimerMonCompte();
+                break;
+            case "session":
+                $this->session();
                 break;
         }
     }
@@ -79,16 +82,12 @@ class AccountController
         $userData = UserRepository::getUserById($idUser);
 
         if (!password_verify($mdpActuel, $userData->getPassword())) {
-            $_SESSION['error_message'] = "Mot de passe actuel incorrect.";
-            header("Location: index.php?controller=account&action=account");
-            exit();
+            echo json_encode(['success' => 0]);
+        } else {
+            UserRepository::updateUser($idUser, $login, $nouveauMdp, $firstname, $lastname);
+            echo json_encode(['success' => 1]);
         }
-
-        UserRepository::updateUser($idUser, $login, $nouveauMdp, $firstname, $lastname);
-
-        header("Location: index.php?controller=account&action=account");
     }
-
 
     private function supprimerMonCompte()
     {
@@ -99,17 +98,12 @@ class AccountController
 
         $userData = UserRepository::getUserById($idUser);
 
-        echo $userData->getPassword();
-
         if (!password_verify($confirmDeletePassword, $userData->getPassword())) {
-            $_SESSION['error_message'] = "Le mot de passe ne correspond pas.";
-            header("Location: index.php?controller=account&action=account");
-            exit();
+            echo json_encode(['success' => 0]);
+        } else {
+            UserRepository::deleteUser($idUser);
+            echo json_encode(['success' => 1]);
         }
-
-        UserRepository::deleteUser($idUser);
-        header("Location: index.php?controller=connexion&action=index");
     }
-
 
 }

@@ -8,13 +8,16 @@ class ConnexionController
 {
     public function __construct($action)
     {
-
+        session_start();
         switch ($action) {
             case "connect":
                 $this->traiterConnexion();
                 break;
             case "deconnect":
                 $this->deconnecter();
+                break;
+            case "session":
+                $this->session();
                 break;
         }
     }
@@ -42,18 +45,22 @@ class ConnexionController
 
     private function deconnecter()
     {
-        session_destroy();
-        $sessionStatus = session_status();
-        if ($sessionStatus === PHP_SESSION_NONE) {
+        $_SESSION['idUser'] = null;
+        if ($_SESSION['idUser'] == null) {
             echo json_encode(['success' => 1]);
         } else {
             echo json_encode(['success' => 0]);
         }
     }
 
-
-
+    private function session()
+    {
+        if ($_SESSION['idUser'] == null) {
+            echo json_encode(['success' => 0]);
+        } else {
+            echo json_encode(['success' => 1]);
+        }
+    }
 
 }
-
 ?>
