@@ -14,13 +14,10 @@ class NoteController {
                 $this->traiterGetNotes();
                 break;
             case "create":
-                $this->createEvent();
+                $this->createNote();
                 break;
             case "update":
-                $this->updateEvent();
-                break;
-            case "delete":
-                $this->deleteEvent();
+                $this->updateNote();
                 break;
         }
     }
@@ -40,40 +37,31 @@ class NoteController {
         }
     }
 
-    private function createEvent()
+    private function createNote()
     {
         $idUser = $_SESSION['idUser'];
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
-        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
-        $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
+        $text = filter_input(INPUT_POST, 'text', FILTER_SANITIZE_STRING);
+        $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING);
 
-        require_once "Repositories/EventRepository.php";
-        EventRepository::createEvent($name, $dateStart, $dateEnd, $idUser, $color);
+        require_once "Repositories/NoteRepository.php";
+        NoteRepository::createNote($text, $date, $idUser);
 
         echo json_encode(['success' => 1]);
     }
 
-    private function updateEvent()
+    private function updateNote()
     {
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
-        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
-        $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
+        $idUser = $_SESSION['idUser'];
+        $text = filter_input(INPUT_POST, 'text', FILTER_SANITIZE_STRING);
+        $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING);
 
-        require_once "Repositories/EventRepository.php";
-        $response = EventRepository::updateEvent($idEvent, $name, $dateStart, $dateEnd, $color);
+        require_once "Repositories/NoteRepository.php";
 
-        echo json_encode(['success' => $response]);
-    }
-
-    private function deleteEvent()
-    {
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
-
-        require_once "Repositories/EventRepository.php";
-        $response = EventRepository::deleteEvent($idEvent);
+        if ($text == "") {
+            $response = NoteRepository::deleteNote($date, $idUser);
+        } else {
+            $response = NoteRepository::updateNote($text, $date, $idUser);
+        }
 
         echo json_encode(['success' => $response]);
     }

@@ -37,14 +37,32 @@ class TaskRepository {
         }
     }
 
-    public static function createEvent($name, $dateStart, $dateEnd, $idUser, $color) {
-        $sql = "INSERT INTO `Events` (name, dateStart, dateEnd, idUser, color) VALUES (:name, :dateStart, :dateEnd, :idUser, :color);";
+    public static function createTask($title, $priority, $date, $idUser) {
+        $sql = "INSERT INTO `Tasks` (title, done, priority, date, idUser) VALUES (:title, 0, :priority, :date, :idUser);";
         $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":name", $name);
-        $stmt->bindValue(":dateStart", $dateStart);
-        $stmt->bindValue(":dateEnd", $dateEnd);
+        $stmt->bindValue(":title", $title);
+        $stmt->bindValue(":priority", $priority);
+        $stmt->bindValue(":date", $date);
         $stmt->bindValue(":idUser", $idUser);
-        $stmt->bindValue(":color", $color);
+
+        $stmt->execute();
+
+        $rowCount = $stmt->rowCount();
+
+        if ($rowCount > 0) {
+            $lastInsertedId = PdoBD::getInstance()->getMonPdo()->lastInsertId();
+            return $lastInsertedId;
+        } else {
+            return 0;
+        }
+    }
+
+    public static function updateTask($idTask, $done, $idUser) {
+        $sql = "UPDATE `Tasks` SET done = :done WHERE idUser = :idUser AND idTask = :idTask";
+        $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
+        $stmt->bindValue(":idTask", $idTask);
+        $stmt->bindValue(":done", $done);
+        $stmt->bindValue(":idUser", $idUser);
 
         $stmt->execute();
 
@@ -57,31 +75,11 @@ class TaskRepository {
         }
     }
 
-    public static function updateEvent($idEvent, $name, $dateStart, $dateEnd, $color) {
-        $sql = "UPDATE `Events` SET name = :name, dateStart = :dateStart, dateEnd = :dateEnd, color = :color WHERE idEvent = :idEvent";
+    public static function deleteTask($idTask, $idUser) {
+        $sql = "DELETE FROM `Tasks` WHERE idUser = :idUser AND idTask = :idTask";
         $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":idEvent", $idEvent);
-        $stmt->bindValue(":name", $name);
-        $stmt->bindValue(":dateStart", $dateStart);
-        $stmt->bindValue(":dateEnd", $dateEnd);
-        $stmt->bindValue(":color", $color);
-
-        $stmt->execute();
-
-        $rowCount = $stmt->rowCount();
-
-        if ($rowCount > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    public static function deleteEvent($idEvent) {
-        $sql = "DELETE FROM `Events` WHERE idEvent = :idEvent";
-        $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":idEvent", $idEvent);
-
+        $stmt->bindValue(":idTask", $idTask);
+        $stmt->bindValue(":idUser", $idUser);
         $stmt->execute();
 
         $rowCount = $stmt->rowCount();

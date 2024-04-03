@@ -14,13 +14,13 @@ class TaskController {
                 $this->traiterGetTasks();
                 break;
             case "create":
-                $this->createEvent();
+                $this->createTask();
                 break;
             case "update":
-                $this->updateEvent();
+                $this->updateTask();
                 break;
             case "delete":
-                $this->deleteEvent();
+                $this->deleteTask();
                 break;
         }
     }
@@ -40,42 +40,43 @@ class TaskController {
         }
     }
 
-    private function createEvent()
+    private function createTask()
     {
         $idUser = $_SESSION['idUser'];
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
-        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
-        $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
+        $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
+        $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_NUMBER_INT);
+        $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING);
 
-        require_once "Repositories/EventRepository.php";
-        EventRepository::createEvent($name, $dateStart, $dateEnd, $idUser, $color);
+        require_once "Repositories/TaskRepository.php";
+        $newTaskId = TaskRepository::createTask($title, $priority, $date, $idUser);
 
+        echo json_encode(['idTask' => $newTaskId]);
+    }
+
+    private function updateTask()
+    {
+        $idUser = $_SESSION['idUser'];
+        $idTask = filter_input(INPUT_POST, 'idTask', FILTER_SANITIZE_NUMBER_INT);
+        $done = filter_input(INPUT_POST, 'done', FILTER_SANITIZE_NUMBER_INT);
+
+        require_once "Repositories/TaskRepository.php";
+        $response = TaskRepository::updateTask($idTask, $done, $idUser);
+
+        if ($response == 1) {
+            echo json_encode(['success' => 1]);
+        } else {
+            echo json_encode(['success' => 0]);
+        }
+    }
+
+    private function deleteTask()
+    {
+        $idUser = $_SESSION['idUser'];
+        $idTask = filter_input(INPUT_POST, 'idTask', FILTER_SANITIZE_NUMBER_INT);
+
+        require_once "Repositories/TaskRepository.php";
+        TaskRepository::deleteTask($idTask, $idUser);
         echo json_encode(['success' => 1]);
-    }
-
-    private function updateEvent()
-    {
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
-        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
-        $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
-
-        require_once "Repositories/EventRepository.php";
-        $response = EventRepository::updateEvent($idEvent, $name, $dateStart, $dateEnd, $color);
-
-        echo json_encode(['success' => $response]);
-    }
-
-    private function deleteEvent()
-    {
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
-
-        require_once "Repositories/EventRepository.php";
-        $response = EventRepository::deleteEvent($idEvent);
-
-        echo json_encode(['success' => $response]);
     }
 
 }

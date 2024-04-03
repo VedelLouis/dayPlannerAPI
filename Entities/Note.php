@@ -41,7 +41,7 @@ class Note implements \JsonSerializable {
         return [
             'idNote' => $this->idNote,
             'text' => $this->text,
-            'dateStart' => $this->date,
+            'date' => $this->date,
             'idUser' => $this->idUser,
             'session' => session_id()
         ];

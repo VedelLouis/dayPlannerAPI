@@ -35,14 +35,12 @@ class NoteRepository {
         }
     }
 
-    public static function createEvent($name, $dateStart, $dateEnd, $idUser, $color) {
-        $sql = "INSERT INTO `Events` (name, dateStart, dateEnd, idUser, color) VALUES (:name, :dateStart, :dateEnd, :idUser, :color);";
+    public static function createNote($text, $date, $idUser) {
+        $sql = "INSERT INTO `Notes` (text, date, idUser) VALUES (:text, :date, :idUser);";
         $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":name", $name);
-        $stmt->bindValue(":dateStart", $dateStart);
-        $stmt->bindValue(":dateEnd", $dateEnd);
+        $stmt->bindValue(":text", $text);
+        $stmt->bindValue(":date", $date);
         $stmt->bindValue(":idUser", $idUser);
-        $stmt->bindValue(":color", $color);
 
         $stmt->execute();
 
@@ -55,14 +53,12 @@ class NoteRepository {
         }
     }
 
-    public static function updateEvent($idEvent, $name, $dateStart, $dateEnd, $color) {
-        $sql = "UPDATE `Events` SET name = :name, dateStart = :dateStart, dateEnd = :dateEnd, color = :color WHERE idEvent = :idEvent";
+    public static function updateNote($text, $date, $idUser) {
+        $sql = "UPDATE `Notes` SET text = :text WHERE date = :date AND idUser = :idUser";
         $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":idEvent", $idEvent);
-        $stmt->bindValue(":name", $name);
-        $stmt->bindValue(":dateStart", $dateStart);
-        $stmt->bindValue(":dateEnd", $dateEnd);
-        $stmt->bindValue(":color", $color);
+        $stmt->bindValue(":text", $text);
+        $stmt->bindValue(":date", $date);
+        $stmt->bindValue(":idUser", $idUser);
 
         $stmt->execute();
 
@@ -75,10 +71,11 @@ class NoteRepository {
         }
     }
 
-    public static function deleteEvent($idEvent) {
-        $sql = "DELETE FROM `Events` WHERE idEvent = :idEvent";
+    public static function deleteNote($date, $idUser) {
+        $sql = "DELETE FROM `Notes` WHERE date = :date AND idUser = :idUser";
         $stmt = PdoBD::getInstance()->getMonPdo()->prepare($sql);
-        $stmt->bindValue(":idEvent", $idEvent);
+        $stmt->bindValue(":date", $date);
+        $stmt->bindValue(":idUser", $idUser);
 
         $stmt->execute();
 
