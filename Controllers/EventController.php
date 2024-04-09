@@ -19,6 +19,9 @@ class EventController {
             case "update":
                 $this->updateEvent();
                 break;
+            case "updateTime":
+                $this->updateEventTime();
+                break;
             case "delete":
                 $this->deleteEvent();
                 break;
@@ -56,6 +59,7 @@ class EventController {
 
     private function updateEvent()
     {
+        $idUser = $_SESSION['idUser'];
         $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
         $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
@@ -63,8 +67,20 @@ class EventController {
         $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
 
         require_once "Repositories/EventRepository.php";
-        $response = EventRepository::updateEvent($idEvent, $name, $dateStart, $dateEnd, $color);
+        $response = EventRepository::updateEvent($idEvent, $name, $dateStart, $dateEnd, $color, $idUser);
 
+        echo json_encode(['success' => $response]);
+    }
+
+    private function updateEventTime()
+    {
+        $idUser = $_SESSION['idUser'];
+        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_NUMBER_INT);
+        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
+        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
+
+        require_once "Repositories/EventRepository.php";
+        $response = EventRepository::updateEventTime($idEvent, $dateStart, $dateEnd, $idUser);
         echo json_encode(['success' => $response]);
     }
 
