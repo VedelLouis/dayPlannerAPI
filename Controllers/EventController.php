@@ -8,7 +8,16 @@ class EventController {
 
     public function __construct($action)
     {
-        session_start();
+        // CORS headers
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+        header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Requested-With');
+        header('Access-Control-Allow-Credentials: true');
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit;
+        }
+
         switch ($action) {
             case "index":
                 $this->traiterGetEvents();
@@ -24,6 +33,9 @@ class EventController {
                 break;
             case "delete":
                 $this->deleteEvent();
+                break;
+            case "sameTime":
+                $this->eventSameTime();
                 break;
         }
     }
@@ -86,11 +98,22 @@ class EventController {
 
     private function deleteEvent()
     {
+        $idUser = $_SESSION['idUser'];
         $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
+        require_once "Repositories/EventRepository.php";
+        $response = EventRepository::deleteEvent($idEvent, $idUser);
+
+        echo json_encode(['success' => $response]);
+    }
+
+    private function eventSameTime()
+    {
+        $idUser = $_SESSION['idUser'];
+        $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
+        $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
 
         require_once "Repositories/EventRepository.php";
-        $response = EventRepository::deleteEvent($idEvent);
-
+        $response = EventRepository::eventSameTime($dateStart, $dateEnd, $idUser);
         echo json_encode(['success' => $response]);
     }
 

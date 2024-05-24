@@ -8,7 +8,22 @@ class NoteController {
 
     public function __construct($action)
     {
+        // CORS headers
         session_start();
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+        $allowed_origins = [
+            'http://localhost:8100',
+            'https://dayplanner.tech',
+            'capacitor-electron://-',
+            'https://localhost'
+        ];
+        if (in_array($origin, $allowed_origins)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+        header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Requested-With');
+        header('Access-Control-Allow-Credentials: true');
+
         switch ($action) {
             case "index":
                 $this->traiterGetNotes();
@@ -26,7 +41,6 @@ class NoteController {
     {
         $idUser = $_SESSION['idUser'];
         $date = filter_input(INPUT_GET, 'date', FILTER_SANITIZE_STRING);
-
         require_once "Repositories/NoteRepository.php";
         $notes = NoteRepository::getNotes($idUser, $date);
 
@@ -65,5 +79,5 @@ class NoteController {
 
         echo json_encode(['success' => $response]);
     }
-
 }
+?>

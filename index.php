@@ -1,4 +1,9 @@
 <?php
+
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'None');
+
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
