@@ -70,7 +70,6 @@ class NoteController {
         $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING);
 
         require_once "Repositories/NoteRepository.php";
-
         if ($text == "") {
             $response = NoteRepository::deleteNote($date, $idUser);
         } else {

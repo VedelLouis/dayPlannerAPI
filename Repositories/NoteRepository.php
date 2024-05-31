@@ -22,9 +22,11 @@ class NoteRepository {
             $notes = [];
 
             foreach ($noteData as $note) {
+                $decodedText = html_entity_decode($note['text'], ENT_QUOTES, 'UTF-8');
+
                 $newNote = new Note(
                     $note['idNote'],
-                    $note['text'],
+                    $decodedText,
                     $note['date'],
                     $note['idUser']
                 );
