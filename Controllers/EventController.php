@@ -9,14 +9,20 @@ class EventController {
     public function __construct($action)
     {
         // CORS headers
-        header('Access-Control-Allow-Origin: *');
+        session_start();
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+        $allowed_origins = [
+            'http://localhost:8100',
+            'https://dayplanner.tech',
+            'capacitor-electron://-',
+            'https://localhost'
+        ];
+        if (in_array($origin, $allowed_origins)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
         header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Requested-With');
         header('Access-Control-Allow-Credentials: true');
-
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-            exit;
-        }
 
         switch ($action) {
             case "index":
@@ -72,7 +78,7 @@ class EventController {
     private function updateEvent()
     {
         $idUser = $_SESSION['idUser'];
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
+        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_NUMBER_INT);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
         $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
         $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
@@ -80,7 +86,6 @@ class EventController {
 
         require_once "Repositories/EventRepository.php";
         $response = EventRepository::updateEvent($idEvent, $name, $dateStart, $dateEnd, $color, $idUser);
-
         echo json_encode(['success' => $response]);
     }
 
