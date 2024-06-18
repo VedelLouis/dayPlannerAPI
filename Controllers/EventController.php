@@ -4,7 +4,8 @@ namespace Controllers;
 
 use Repositories\EventRepository;
 
-class EventController {
+class EventController
+{
 
     public function __construct($action)
     {
@@ -43,6 +44,9 @@ class EventController {
             case "sameTime":
                 $this->eventSameTime();
                 break;
+            case "choiceMove":
+                $this->choiceMoveEvent();
+                break;
         }
     }
 
@@ -70,9 +74,8 @@ class EventController {
         $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING);
 
         require_once "Repositories/EventRepository.php";
-        EventRepository::createEvent($name, $dateStart, $dateEnd, $idUser, $color);
-
-        echo json_encode(['success' => 1]);
+        $newEventId = EventRepository::createEvent($name, $dateStart, $dateEnd, $idUser, $color);
+        echo json_encode(['success' => 1, 'idEvent' => $newEventId]);
     }
 
     private function updateEvent()
@@ -104,10 +107,9 @@ class EventController {
     private function deleteEvent()
     {
         $idUser = $_SESSION['idUser'];
-        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_STRING);
+        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_NUMBER_INT);
         require_once "Repositories/EventRepository.php";
         $response = EventRepository::deleteEvent($idEvent, $idUser);
-
         echo json_encode(['success' => $response]);
     }
 
@@ -116,10 +118,31 @@ class EventController {
         $idUser = $_SESSION['idUser'];
         $dateStart = filter_input(INPUT_POST, 'dateStart', FILTER_SANITIZE_STRING);
         $dateEnd = filter_input(INPUT_POST, 'dateEnd', FILTER_SANITIZE_STRING);
+        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_VALIDATE_INT, ['options' => ['default' => null]]);
 
         require_once "Repositories/EventRepository.php";
-        $response = EventRepository::eventSameTime($dateStart, $dateEnd, $idUser);
+        $response = EventRepository::eventSameTime($dateStart, $dateEnd, $idUser, $idEvent);
         echo json_encode(['success' => $response]);
+    }
+
+    private function choiceMoveEvent()
+    {
+        $idUser = $_SESSION['idUser'];
+        $choice = filter_input(INPUT_POST, 'choice', FILTER_SANITIZE_NUMBER_INT);
+        $idEvent = filter_input(INPUT_POST, 'idEvent', FILTER_SANITIZE_NUMBER_INT);
+        $oldDateStart = filter_input(INPUT_POST, 'oldDateStart', FILTER_SANITIZE_STRING);
+        $oldDateEnd = filter_input(INPUT_POST, 'oldDateEnd', FILTER_SANITIZE_STRING);
+        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING, ['options' => ['default' => null]]);
+        $color = filter_input(INPUT_POST, 'color', FILTER_SANITIZE_STRING, ['options' => ['default' => null]]);
+
+        require_once "Repositories/EventRepository.php";
+        $newEventId = EventRepository::choiceMoveEvent($idUser, $choice, $idEvent, $oldDateStart, $oldDateEnd, $name, $color);
+
+        if ($choice == 2) {
+            echo json_encode(['success' => 1, 'idEvent' => $newEventId]);
+        } else {
+            echo json_encode(['success' => 1]);
+        }
     }
 
 }
