@@ -13,7 +13,7 @@ class NoteController {
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
         $allowed_origins = [
             'http://localhost:8100',
-            'https://dayplanner.tech',
+            'https://projects.lvedel.com/dayplanner/',
             'capacitor-electron://-',
             'https://localhost'
         ];
